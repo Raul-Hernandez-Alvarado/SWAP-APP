@@ -1,66 +1,57 @@
-## Foundry
+# SwapApp 🔄
 
-**Foundry is a blazing fast, portable and modular toolkit for Ethereum application development written in Rust.**
+A highly optimized smart contract for swapping ERC20 tokens using the Uniswap V2 Router. Built with Solidity and [Foundry](https://getfoundry.sh/), and thoroughly tested on an Arbitrum Mainnet fork.
 
-Foundry consists of:
+## Features ✨
+- **Token Swapping**: Seamlessly swap exact amounts of input tokens for a minimum amount of output tokens to protect against slippage.
+- **Safe Transfers**: Utilizes OpenZeppelin's `SafeERC20` (`safeTransferFrom`, `forceApprove`) to securely handle tokens that don't strictly adhere to the standard ERC20 implementation (e.g., USDT).
+- **Gas Optimized**: 
+  - Declares the Uniswap Router address as `immutable` to avoid expensive storage reads.
+  - Replaces traditional string require messages with Custom Errors (`ZeroAmount`, `InvalidPath`) to significantly reduce deployment and runtime gas costs.
+- **Standardized Integration**: Interfaces directly with the standard `IV2Router02`.
 
-- **Forge**: Ethereum testing framework (like Truffle, Hardhat and DappTools).
-- **Cast**: Swiss army knife for interacting with EVM smart contracts, sending transactions and getting chain data.
-- **Anvil**: Local Ethereum node, akin to Ganache, Hardhat Network.
-- **Chisel**: Fast, utilitarian, and verbose solidity REPL.
+## Prerequisites 📋
+- [Foundry](https://book.getfoundry.sh/getting-started/installation) installed on your machine.
+- An Arbitrum Mainnet RPC URL (Alchemy, Infura, or public) for testing.
 
-## Documentation
+## Setup & Installation 🛠️
 
-https://book.getfoundry.sh/
-
-## Usage
-
-### Build
-
-```shell
-$ forge build
+1. Clone the repository:
+```bash
+git clone [https://github.com/your-username/SWAP-APP.git](https://github.com/your-username/SWAP-APP.git)
+cd SWAP-APP
 ```
 
-### Test
-
-```shell
-$ forge test
+2. Install dependencies (OpenZeppelin contracts):
+```bash
+forge install OpenZeppelin/openzeppelin-contracts --no-commit
 ```
 
-### Format
-
-```shell
-$ forge fmt
+3. Build the project:
+```bash
+forge build
 ```
 
-### Gas Snapshots
+## Testing 🧪
+The test suite (`SwapAppTest.sol`) interacts with real mainnet liquidity pools. It impersonates a whale account to execute live token swaps (USDT to DAI) and verifies Custom Error reverts. 
 
-```shell
-$ forge snapshot
+Because it uses real Arbitrum addresses, **you must run the tests on an Arbitrum Mainnet fork**.
+
+Execute the following command, replacing `<YOUR_ARBITRUM_RPC_URL>` with your actual RPC endpoint:
+
+```bash
+forge test --fork-url <YOUR_ARBITRUM_RPC_URL>
 ```
 
-### Anvil
-
-```shell
-$ anvil
+To see detailed execution traces (useful for debugging balances and gas values):
+```bash
+forge test --fork-url <YOUR_ARBITRUM_RPC_URL> -vvvv
 ```
 
-### Deploy
+## Smart Contract Architecture 🏗️
+### `SwapApp.sol`
+- `constructor(address _v2Router02)`: Initializes the immutable state variable with the target Dex Router.
+- `swapTokens(uint256 amountIn, uint256 amountOutMin, address[] memory path, uint256 deadline)`: Pulls funds from the user, approves the router, and executes the exact input swap.
 
-```shell
-$ forge script script/Counter.s.sol:CounterScript --rpc-url <your_rpc_url> --private-key <your_private_key>
-```
-
-### Cast
-
-```shell
-$ cast <subcommand>
-```
-
-### Help
-
-```shell
-$ forge --help
-$ anvil --help
-$ cast --help
-```
+## License 📄
+This project is licensed under the MIT License.
